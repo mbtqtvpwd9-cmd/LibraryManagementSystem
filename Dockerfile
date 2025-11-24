@@ -7,11 +7,7 @@ WORKDIR /app
 # 复制Maven配置文件
 COPY pom.xml .
 
-# 复制Maven wrapper文件（如果存在）
-COPY mvnw* ./
-COPY .mvn .mvn
-
-# 安装Maven（如果没有使用wrapper）
+# 安装Maven
 RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
 
 # 下载依赖（利用Docker缓存层）

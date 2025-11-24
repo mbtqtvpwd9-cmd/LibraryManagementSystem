@@ -27,8 +27,8 @@
 
 1. **克隆项目**
 ```bash
-git clone <repository-url>
-cd library-management-system
+git clone https://github.com/mbtqtvpwd9-cmd/LibraryManagementSystem.git
+cd LibraryManagementSystem
 ```
 
 2. **运行应用**
