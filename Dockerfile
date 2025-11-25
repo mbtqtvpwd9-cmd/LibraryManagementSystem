@@ -1,5 +1,5 @@
 # 构建阶段
-FROM registry.cn-hangzhou.aliyuncs.com/library/maven:3.9-openjdk-17 AS builder
+FROM maven:3.9-openjdk-17 AS builder
 
 WORKDIR /app
 COPY pom.xml .
@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # 运行阶段
-FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-jdk-slim
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 COPY --from=builder /app/target/library-management-system-1.0.0.jar app.jar
