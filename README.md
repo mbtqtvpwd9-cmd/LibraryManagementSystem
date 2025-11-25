@@ -50,12 +50,21 @@ java -jar target/library-management-system-1.0.0.jar
 
 ### Docker部署
 
-1. **使用Docker Compose**
+#### 方式1：标准部署
 ```bash
 docker-compose up -d
 ```
 
-2. **访问应用**
+#### 方式2：离线部署（推荐，避免网络问题）
+```bash
+# 1. 下载所有需要的镜像
+./pull-images.sh
+
+# 2. 一键离线部署
+./offline-deploy.sh
+```
+
+#### 访问应用
 - 应用地址: http://localhost:8080
 - MySQL数据库: localhost:3306
 
