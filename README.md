@@ -64,6 +64,15 @@ docker-compose up -d
 ./offline-deploy.sh
 ```
 
+#### 方式3：Ubuntu基础镜像部署（解决Maven镜像问题）
+```bash
+# 1. 下载基础镜像
+./pull-basic-images.sh
+
+# 2. 一键Ubuntu部署
+./deploy-ubuntu.sh
+```
+
 #### 访问应用
 - 应用地址: http://localhost:8080
 - MySQL数据库: localhost:3306
