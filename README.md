@@ -91,18 +91,24 @@ docker-compose up -d
 ssh root@your-server-ip
 
 # 2. 克隆项目
-git clone <your-github-repository-url>
-cd library-management-system
+git clone https://github.com/mbtqtvpwd9-cmd/LibraryManagementSystem.git
+cd LibraryManagementSystem
 
-# 3. 构建并运行Docker容器
-docker-compose up -d
+# 3. 一键最终部署（推荐）
+./final-deploy.sh
 
 # 4. 查看运行状态
-docker-compose ps
+docker-compose -f docker-compose.ubuntu.yml ps
 
 # 5. 查看日志
-docker-compose logs -f app
+docker-compose -f docker-compose.ubuntu.yml logs -f app
 ```
+
+### 3. 部署方式说明
+
+- **方式1**: `./final-deploy.sh` - 最终版本，修复所有问题
+- **方式2**: `./deploy-ubuntu.sh` - Ubuntu基础镜像版本
+- **方式3**: `./offline-deploy.sh` - 离线部署版本
 
 ### 3. 配置防火墙
 ```bash
