@@ -1,14 +1,11 @@
-# 使用官方的OpenJDK 17作为基础镜像
-FROM openjdk:17-jdk-slim
+# 使用包含Maven的官方镜像
+FROM maven:3.9-openjdk-17
 
 # 设置工作目录
 WORKDIR /app
 
 # 复制Maven配置文件
 COPY pom.xml .
-
-# 安装Maven
-RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
 
 # 下载依赖（利用Docker缓存层）
 RUN mvn dependency:go-offline -B
