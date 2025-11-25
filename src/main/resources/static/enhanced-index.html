@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧图书管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #34495e 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: var(--secondary-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .main-content {
+            padding: 30px;
+            background: rgba(255,255,255,0.95);
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .login-container {
+            max-width: 450px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .book-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .book-cover {
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .book-info {
+            padding: 20px;
+        }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .book-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .book-stock {
+            background: var(--light-bg);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(45deg, var(--secondary-color), #2980b9);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .view-btn {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn.active {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .table-view {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .table-view thead {
+            background: linear-gradient(45deg, var(--primary-color), #34495e);
+            color: white;
+        }
+
+        .table-view tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .book-cover-small {
+            width: 40px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm-custom {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 5px;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            background: linear-gradient(45deg, var(--primary-color), #34495e);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .page-header {
+            background: linear-gradient(45deg, var(--primary-color), #34495e);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .floating-add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--success-color), #229954);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 登录页面 -->
+        <div v-if="!isLoggedIn" class="login-container">
+            <div class="text-center mb-4">
+                <i class="fas fa-book-open fa-3x text-primary mb-3"></i>
+                <h2>智慧图书管理系统</h2>
+                <p class="text-muted">请登录以继续</p>
+            </div>
+            <form @submit.prevent="login">
+                <div class="mb-3">
+                    <label class="form-label">用户名</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" v-model="loginForm.username" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密码</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" v-model="loginForm.password" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">角色</label>
+                    <select class="form-select" v-model="loginForm.role">
+                        <option value="ADMIN">管理员</option>
+                        <option value="USER">读者</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-custom w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i>登录
+                </button>
+            </form>
+        </div>
+
+        <!-- 主界面 -->
+        <div v-else class="container-fluid">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-md-2 sidebar p-0">
+                    <div class="p-3">
+                        <h4 class="text-white mb-4">
+                            <i class="fas fa-book-open me-2"></i>图书管理
+                        </h4>
+                        <nav class="nav flex-column">
+                            <a class="nav-link" :class="{active: currentView === 'dashboard'}" @click="currentView = 'dashboard'">
+                                <i class="fas fa-tachometer-alt me-2"></i>仪表盘
+                            </a>
+                            <a class="nav-link" :class="{active: currentView === 'books'}" @click="currentView = 'books'">
+                                <i class="fas fa-book me-2"></i>图书管理
+                            </a>
+                            <a class="nav-link" :class="{active: currentView === 'borrowing'}" @click="currentView = 'borrowing'">
+                                <i class="fas fa-hand-holding me-2"></i>借阅管理
+                            </a>
+                            <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'" v-if="currentUser.role === 'ADMIN'">
+                                <i class="fas fa-users me-2"></i>用户管理
+                            </a>
+                            <a class="nav-link" :class="{active: currentView === 'reports'}" @click="currentView = 'reports'">
+                                <i class="fas fa-chart-bar me-2"></i>统计报表
+                            </a>
+                            <a class="nav-link" @click="logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="col-md-10 main-content">
+                    <!-- 仪表盘 -->
+                    <div v-if="currentView === 'dashboard'">
+                        <div class="page-header">
+                            <h2><i class="fas fa-tachometer-alt me-2"></i>仪表盘</h2>
+                            <p class="mb-0">欢迎回来，{{ currentUser.username }}！</p>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon text-primary">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="stats-number">{{ stats.totalBooks }}</div>
+                                    <div class="text-muted">图书总数</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon text-success">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stats-number">{{ stats.totalUsers }}</div>
+                                    <div class="text-muted">用户总数</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon text-warning">
+                                        <i class="fas fa-hand-holding"></i>
+                                    </div>
+                                    <div class="stats-number">{{ stats.borrowedBooks }}</div>
+                                    <div class="text-muted">已借出</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stats-card">
+                                    <div class="stats-icon text-info">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="stats-number">{{ stats.overdueBooks }}</div>
+                                    <div class="text-muted">逾期未还</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图书管理 -->
+                    <div v-if="currentView === 'books'">
+                        <div class="page-header">
+                            <h2><i class="fas fa-book me-2"></i>图书管理</h2>
+                            <p class="mb-0">管理图书馆的所有图书资源</p>
+                        </div>
+
+                        <!-- 搜索框 -->
+                        <div class="search-box">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <input type="text" class="form-control" placeholder="书名" v-model="searchForm.title">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <input type="text" class="form-control" placeholder="作者" v-model="searchForm.author">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <input type="text" class="form-control" placeholder="出版社" v-model="searchForm.publisher">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <button class="btn btn-primary-custom btn-custom me-2" @click="searchBooks">
+                                        <i class="fas fa-search me-1"></i>搜索
+                                    </button>
+                                    <button class="btn btn-secondary btn-custom" @click="resetSearch">
+                                        <i class="fas fa-redo me-1"></i>重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 视图切换 -->
+                        <div class="view-toggle">
+                            <button class="view-btn" :class="{active: viewMode === 'grid'}" @click="viewMode = 'grid'">
+                                <i class="fas fa-th me-1"></i>网格视图
+                            </button>
+                            <button class="view-btn" :class="{active: viewMode === 'list'}" @click="viewMode = 'list'">
+                                <i class="fas fa-list me-1"></i>列表视图
+                            </button>
+                        </div>
+
+                        <!-- 网格视图 -->
+                        <div v-if="viewMode === 'grid'" class="row">
+                            <div class="col-md-3 mb-4" v-for="book in books" :key="book.id">
+                                <div class="book-card">
+                                    <div class="book-cover">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="book-info">
+                                        <div class="book-title">{{ book.title }}</div>
+                                        <div class="book-author">
+                                            <i class="fas fa-user-edit me-1"></i>{{ book.author }}
+                                        </div>
+                                        <div class="book-author">
+                                            <i class="fas fa-building me-1"></i>{{ book.publisher }}
+                                        </div>
+                                        <div class="book-meta">
+                                            <span class="book-price">¥{{ book.price }}</span>
+                                            <span class="book-stock">库存: {{ book.stockQuantity }}</span>
+                                        </div>
+                                        <div class="action-buttons mt-3">
+                                            <button class="btn btn-sm btn-primary btn-sm-custom" @click="editBook(book)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger btn-sm-custom" @click="deleteBook(book.id)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 列表视图 -->
+                        <div v-if="viewMode === 'list'" class="table-view">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>封面</th>
+                                        <th>书名</th>
+                                        <th>作者</th>
+                                        <th>出版社</th>
+                                        <th>价格</th>
+                                        <th>库存</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="book in books" :key="book.id">
+                                        <td>
+                                            <div class="book-cover-small">
+                                                <i class="fas fa-book"></i>
+                                            </div>
+                                        </td>
+                                        <td>{{ book.title }}</td>
+                                        <td>{{ book.author }}</td>
+                                        <td>{{ book.publisher }}</td>
+                                        <td>¥{{ book.price }}</td>
+                                        <td>{{ book.stockQuantity }}</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm btn-primary btn-sm-custom" @click="editBook(book)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger btn-sm-custom" @click="deleteBook(book.id)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 浮动添加按钮 -->
+        <button class="floating-add-btn" @click="showAddBookModal" v-if="currentView === 'books' && currentUser.role === 'ADMIN'">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- 图书编辑模态框 -->
+        <div class="modal fade" id="bookModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-book me-2"></i>{{ editingBook.id ? '编辑图书' : '添加图书' }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="saveBook">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">ISBN *</label>
+                                    <input type="text" class="form-control" v-model="editingBook.isbn" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">书名 *</label>
+                                    <input type="text" class="form-control" v-model="editingBook.title" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">作者 *</label>
+                                    <input type="text" class="form-control" v-model="editingBook.author" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">出版社 *</label>
+                                    <input type="text" class="form-control" v-model="editingBook.publisher" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">出版年份 *</label>
+                                    <input type="number" class="form-control" v-model="editingBook.publishYear" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">价格 *</label>
+                                    <input type="number" step="0.01" class="form-control" v-model="editingBook.price" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">库存数量 *</label>
+                                    <input type="number" class="form-control" v-model="editingBook.stockQuantity" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">分类</label>
+                                <select class="form-select" v-model="editingBook.category">
+                                    <option value="">请选择分类</option>
+                                    <option value="文学">文学</option>
+                                    <option value="科技">科技</option>
+                                    <option value="历史">历史</option>
+                                    <option value="艺术">艺术</option>
+                                    <option value="教育">教育</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">语言</label>
+                                    <select class="form-select" v-model="editingBook.language">
+                                        <option value="">请选择语言</option>
+                                        <option value="中文">中文</option>
+                                        <option value="英文">英文</option>
+                                        <option value="日文">日文</option>
+                                        <option value="其他">其他</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">存放位置</label>
+                                    <input type="text" class="form-control" v-model="editingBook.location" placeholder="如：A区1架2层">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">描述</label>
+                                <textarea class="form-control" rows="3" v-model="editingBook.description"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="saveBook">
+                            <i class="fas fa-save me-1"></i>保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    isLoggedIn: false,
+                    currentUser: null,
+                    currentView: 'dashboard',
+                    viewMode: 'grid',
+                    books: [],
+                    stats: {
+                        totalBooks: 0,
+                        totalUsers: 0,
+                        borrowedBooks: 0,
+                        overdueBooks: 0
+                    },
+                    loginForm: {
+                        username: '',
+                        password: '',
+                        role: 'ADMIN'
+                    },
+                    searchForm: {
+                        title: '',
+                        author: '',
+                        publisher: '',
+                        isbn: ''
+                    },
+                    editingBook: {
+                        id: null,
+                        isbn: '',
+                        title: '',
+                        author: '',
+                        publisher: '',
+                        publishYear: new Date().getFullYear(),
+                        price: 0,
+                        stockQuantity: 1,
+                        description: '',
+                        category: '',
+                        language: '',
+                        location: ''
+                    },
+                    bookModal: null
+                };
+            },
+            mounted() {
+                this.bookModal = new bootstrap.Modal(document.getElementById('bookModal'));
+                this.checkAuth();
+            },
+            methods: {
+                checkAuth() {
+                    const token = localStorage.getItem('token');
+                    const user = localStorage.getItem('user');
+                    if (token && user) {
+                        this.isLoggedIn = true;
+                        this.currentUser = JSON.parse(user);
+                        this.loadBooks();
+                        this.loadStats();
+                    }
+                },
+                async login() {
+                    try {
+                        const response = await axios.post('/api/auth/login', this.loginForm);
+                        localStorage.setItem('token', response.data.token);
+                        localStorage.setItem('user', JSON.stringify(response.data.user));
+                        this.isLoggedIn = true;
+                        this.currentUser = response.data.user;
+                        this.loadBooks();
+                        this.loadStats();
+                    } catch (error) {
+                        alert('登录失败：' + (error.response?.data?.message || '未知错误'));
+                    }
+                },
+                logout() {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    this.isLoggedIn = false;
+                    this.currentUser = null;
+                },
+                async loadBooks() {
+                    try {
+                        const response = await axios.get('/api/books', {
+                            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                        });
+                        this.books = response.data.content || response.data;
+                    } catch (error) {
+                        console.error('加载图书失败:', error);
+                    }
+                },
+                async loadStats() {
+                    try {
+                        const bookCount = await axios.get('/api/books/count');
+                        this.stats.totalBooks = bookCount.data;
+                        this.stats.totalUsers = 150; // 模拟数据
+                        this.stats.borrowedBooks = 23; // 模拟数据
+                        this.stats.overdueBooks = 5; // 模拟数据
+                    } catch (error) {
+                        console.error('加载统计数据失败:', error);
+                    }
+                },
+                async searchBooks() {
+                    try {
+                        const params = new URLSearchParams();
+                        Object.keys(this.searchForm).forEach(key => {
+                            if (this.searchForm[key]) {
+                                params.append(key, this.searchForm[key]);
+                            }
+                        });
+                        
+                        const response = await axios.get(`/api/books/search?${params}`, {
+                            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                        });
+                        this.books = response.data.content || response.data;
+                    } catch (error) {
+                        console.error('搜索图书失败:', error);
+                    }
+                },
+                resetSearch() {
+                    this.searchForm = {
+                        title: '',
+                        author: '',
+                        publisher: '',
+                        isbn: ''
+                    };
+                    this.loadBooks();
+                },
+                showAddBookModal() {
+                    this.editingBook = {
+                        id: null,
+                        isbn: '',
+                        title: '',
+                        author: '',
+                        publisher: '',
+                        publishYear: new Date().getFullYear(),
+                        price: 0,
+                        stockQuantity: 1,
+                        description: '',
+                        category: '',
+                        language: '',
+                        location: ''
+                    };
+                    this.bookModal.show();
+                },
+                editBook(book) {
+                    this.editingBook = { ...book };
+                    this.bookModal.show();
+                },
+                async saveBook() {
+                    try {
+                        const token = localStorage.getItem('token');
+                        let response;
+                        
+                        if (this.editingBook.id) {
+                            response = await axios.put(`/api/books/${this.editingBook.id}`, this.editingBook, {
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            });
+                        } else {
+                            response = await axios.post('/api/books', this.editingBook, {
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            });
+                        }
+                        
+                        this.bookModal.hide();
+                        this.loadBooks();
+                        alert(this.editingBook.id ? '图书更新成功！' : '图书添加成功！');
+                    } catch (error) {
+                        alert('保存失败：' + (error.response?.data?.message || '未知错误'));
+                    }
+                },
+                async deleteBook(id) {
+                    if (confirm('确定要删除这本图书吗？')) {
+                        try {
+                            await axios.delete(`/api/books/${id}`, {
+                                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                            });
+                            this.loadBooks();
+                            alert('图书删除成功！');
+                        } catch (error) {
+                            alert('删除失败：' + (error.response?.data?.message || '未知错误'));
+                        }
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

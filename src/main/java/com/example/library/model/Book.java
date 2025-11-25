@@ -46,6 +46,23 @@ public class Book {
 
     @Size(max = 500, message = "描述长度不能超过500个字符")
     private String description;
+    
+    @Size(max = 50, message = "分类长度不能超过50个字符")
+    private String category;
+    
+    @Size(max = 20, message = "语言长度不能超过20个字符")
+    private String language;
+    
+    @Size(max = 100, message = "封面图片URL长度不能超过100个字符")
+    private String coverImageUrl;
+    
+    private Integer totalQuantity;
+    
+    private Integer borrowedQuantity;
+    
+    private String location;
+    
+    private String status;
 
     public Book() {}
 
@@ -88,4 +105,25 @@ public class Book {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
+    
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
+    
+    public Integer getTotalQuantity() { return totalQuantity; }
+    public void setTotalQuantity(Integer totalQuantity) { this.totalQuantity = totalQuantity; }
+    
+    public Integer getBorrowedQuantity() { return borrowedQuantity; }
+    public void setBorrowedQuantity(Integer borrowedQuantity) { this.borrowedQuantity = borrowedQuantity; }
+    
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
