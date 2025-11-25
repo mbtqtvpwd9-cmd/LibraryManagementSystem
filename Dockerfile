@@ -1,26 +1,20 @@
-# 使用包含Maven的官方镜像
-FROM maven:3.9-openjdk-17
+# 构建阶段
+FROM registry.cn-hangzhou.aliyuncs.com/library/maven:3.9-openjdk-17 AS builder
 
-# 设置工作目录
 WORKDIR /app
-
-# 复制Maven配置文件
 COPY pom.xml .
+RUN mvn dependency:go-offline -B || true
 
-# 下载依赖（利用Docker缓存层）
-RUN mvn dependency:go-offline -B
-
-# 复制源代码
 COPY src ./src
-
-# 构建应用
 RUN mvn clean package -DskipTests
 
-# 暴露端口
-EXPOSE 8080
+# 运行阶段
+FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-jdk-slim
 
-# 设置JVM参数
+WORKDIR /app
+COPY --from=builder /app/target/library-management-system-1.0.0.jar app.jar
+
+EXPOSE 8080
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
-# 运行应用
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar target/library-management-system-1.0.0.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
