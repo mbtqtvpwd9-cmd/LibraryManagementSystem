@@ -1,6 +1,6 @@
 # 图书管理系统
 
-一个基于Spring Boot的简单C/S架构图书管理系统，支持管理员和读者两种角色。
+一个基于Spring Boot的现代化图书管理系统，具有专业级UI/UX设计和完整的功能实现。
 
 ## 功能特性
 
@@ -73,8 +73,7 @@ java -jar target/library-management-system-1.0.0.jar
 ```
 
 3. **访问应用**
-- 📱 标准界面: http://localhost:8080
-- ✨ 增强界面: http://localhost:8080/enhanced-index.html
+- 🌟 最终界面: http://localhost:8080
 - H2数据库控制台: http://localhost:8080/h2-console
   - JDBC URL: `jdbc:h2:mem:librarydb`
   - 用户名: `sa`
