@@ -46,13 +46,18 @@ public class AuthController {
             
             String token = jwtUtil.generateToken(user);
             
+            // 创建用户对象
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", user.getId());
+            userMap.put("username", user.getUsername());
+            userMap.put("role", user.getRole());
+            userMap.put("email", user.getEmail());
+            
+            // 创建响应对象
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             response.put("type", "Bearer");
-            response.put("id", user.getId());
-            response.put("username", user.getUsername());
-            response.put("role", user.getRole());
-            response.put("email", user.getEmail());
+            response.put("user", userMap);
             
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
