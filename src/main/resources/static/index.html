@@ -849,6 +849,63 @@
             margin-bottom: 10px;
             font-weight: 600;
         }
+
+        /* 分页样式 */
+        .pagination-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .page-item {
+            margin: 0 2px;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid #dee2e6;
+            background: white;
+            color: #495057;
+            text-decoration: none;
+            transition: var(--transition);
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .page-item:not(.disabled) .page-link:hover {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+        }
+
+        .page-item.active .page-link {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.2);
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background: #f8f9fa;
+            border-color: #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -876,7 +933,7 @@
                         <div class="form-floating">
                             <select class="form-select" id="role" v-model="loginForm.role">
                                 <option value="ADMIN">管理员</option>
-                                <option value="USER">读者</option>
+                                <option value="READER">读者</option>
                             </select>
                             <label for="role"><i class="fas fa-user-tag me-2"></i>角色</label>
                         </div>
@@ -1189,6 +1246,42 @@
                             </div>
                         </div>
 
+                        <!-- 分页控件 -->
+                        <div v-if="!loading && totalPages > 1" class="pagination-container">
+                            <nav aria-label="图书分页">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" :class="{ disabled: currentPage === 0 }">
+                                        <button class="page-link" @click="loadBooks(0)" :disabled="currentPage === 0">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </button>
+                                    </li>
+                                    <li class="page-item" :class="{ disabled: currentPage === 0 }">
+                                        <button class="page-link" @click="loadBooks(currentPage - 1)" :disabled="currentPage === 0">
+                                            <i class="fas fa-angle-left"></i>
+                                        </button>
+                                    </li>
+                                    
+                                    <li v-for="page in getVisiblePages()" :key="page" 
+                                        class="page-item" :class="{ active: currentPage === page }">
+                                        <button class="page-link" @click="loadBooks(page)">
+                                            {{ page + 1 }}
+                                        </button>
+                                    </li>
+                                    
+                                    <li class="page-item" :class="{ disabled: currentPage === totalPages - 1 }">
+                                        <button class="page-link" @click="loadBooks(currentPage + 1)" :disabled="currentPage === totalPages - 1">
+                                            <i class="fas fa-angle-right"></i>
+                                        </button>
+                                    </li>
+                                    <li class="page-item" :class="{ disabled: currentPage === totalPages - 1 }">
+                                        <button class="page-link" @click="loadBooks(totalPages - 1)" :disabled="currentPage === totalPages - 1">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
                         <!-- 空状态 -->
                         <div v-if="!loading && books.length === 0" class="empty-state">
                             <i class="fas fa-inbox"></i>
@@ -1419,6 +1512,8 @@
                     showPassword: false,
                     loginError: '',
                     loginLoading: false,
+                    currentPage: 0,
+                    totalPages: 1,
                     books: [],
                     stats: {
                         totalBooks: 0,
@@ -1531,13 +1626,21 @@
                     this.loginError = '';
                     this.showPassword = false;
                 },
-                async loadBooks() {
+                async loadBooks(page = 0) {
                     this.loading = true;
                     try {
                         const response = await axios.get('/api/books', {
+                            params: {
+                                page: page,
+                                size: 20,
+                                sortBy: 'id',
+                                sortDir: 'desc'
+                            },
                             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                         });
                         this.books = response.data.content || response.data;
+                        this.totalPages = response.data.totalPages || 1;
+                        this.currentPage = page;
                     } catch (error) {
                         console.error('加载图书失败:', error);
                     } finally {
@@ -1700,6 +1803,21 @@
                     if (this.recentActivities.length > 5) {
                         this.recentActivities.pop();
                     }
+                },
+                getVisiblePages() {
+                    const maxVisible = 5;
+                    let start = Math.max(0, this.currentPage - Math.floor(maxVisible / 2));
+                    let end = Math.min(this.totalPages, start + maxVisible);
+                    
+                    if (end - start < maxVisible) {
+                        start = Math.max(0, end - maxVisible);
+                    }
+                    
+                    const pages = [];
+                    for (let i = start; i < end; i++) {
+                        pages.push(i);
+                    }
+                    return pages;
                 }
             }
         }).mount('#app');
