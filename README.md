@@ -119,7 +119,8 @@ git checkout advanced-tech-stack
 
 | 脚本名称 | 用途 |
 |---------|------|
-| `java-fix-deploy.sh` | 完整部署脚本（推荐首次使用）|
+| `fix-login-and-security.sh` | 修复登录和Spring Security问题（推荐使用）|
+| `java-fix-deploy.sh` | 完整部署脚本（首次使用）|
 | `manual-deploy.sh` | 手动更新部署脚本 |
 | `check-deployment.sh` | 检查部署状态 |
 | `troubleshoot-network.sh` | 网络问题排查 |
@@ -219,8 +220,32 @@ docker ps
 
 ### 认证接口
 - `POST /api/auth/login` - 用户登录
+  ```json
+  // 请求体
+  {
+    "username": "admin",
+    "password": "admin123",
+    "role": "ADMIN"  // 可选: ADMIN 或 READER
+  }
+  
+  // 响应体
+  {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "type": "Bearer",
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "role": "ADMIN",
+      "email": "admin@library.com"
+    }
+  }
+  ```
 - `POST /api/auth/register` - 用户注册
 - `GET /api/auth/me` - 获取当前用户信息
+  ```json
+  // 请求头
+  Authorization: Bearer <token>
+  ```
 - `POST /api/auth/logout` - 用户退出
 
 ### 图书接口
@@ -251,9 +276,35 @@ docker ps
 - role: 角色（ADMIN/READER）
 - email: 邮箱
 
+## Spring Security 配置
+
+系统已集成Spring Security进行身份验证和授权，支持以下特性：
+
+### 认证机制
+- **JWT令牌认证**: 基于JSON Web Token的无状态认证
+- **BCrypt密码加密**: 使用BCrypt算法加密存储用户密码
+- **角色权限控制**: 支持管理员(ADMIN)和读者(READER)两种角色
+
+### 认证流程
+1. 用户通过前端登录界面提交用户名、密码和角色
+2. 后端验证凭据，验证成功后生成JWT令牌
+3. 前端存储JWT令牌，并在后续请求中携带
+4. 后端通过JWT过滤器验证令牌有效性
+
+### 安全配置
+- CORS跨域支持
+- CSRF防护禁用(适用于API服务)
+- 无状态会话管理
+- 公开路径和受保护路径分离
+
 ## 默认账户
-- **管理员**: 用户名 `admin`, 密码 `admin123`
-- **读者**: 用户名 `reader`, 密码 `reader123`
+
+系统启动时会自动创建两个默认账户：
+
+- **管理员**: 用户名 `admin`, 密码 `admin123`, 角色 `ADMIN`
+- **读者**: 用户名 `reader`, 密码 `reader123`, 角色 `READER`
+
+管理员拥有完整系统访问权限，读者只能访问图书查询和借阅功能。
 
 ## 访问地址
 - 前端应用: http://150.158.125.55:3000

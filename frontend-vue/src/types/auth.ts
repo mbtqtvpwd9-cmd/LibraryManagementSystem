@@ -1,14 +1,4 @@
-export interface User {
-  id: number
-  username: string
-  email: string
-  role: 'ADMIN' | 'READER'
-  avatar?: string
-  phone?: string
-  createdAt?: string
-  updatedAt?: string
-  status?: 'ACTIVE' | 'INACTIVE'
-}
+// 认证相关的类型定义
 
 export interface LoginForm {
   username: string
@@ -16,12 +6,11 @@ export interface LoginForm {
   role: 'ADMIN' | 'READER'
 }
 
-export interface RegisterForm {
+export interface User {
+  id: number
   username: string
-  password: string
-  email: string
+  email?: string
   role: 'ADMIN' | 'READER'
-  phone?: string
 }
 
 export interface LoginResponse {
