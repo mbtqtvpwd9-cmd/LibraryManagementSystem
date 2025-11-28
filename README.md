@@ -1,6 +1,6 @@
 # 图书管理系统
 
-一个基于Spring Boot的现代化图书管理系统，具有专业级UI/UX设计和完整的功能实现。
+一个基于Spring Boot的现代化图书管理系统，具有专业级UI/UX设计和完整的功能实现，支持Docker容器化部署。
 
 ## 功能特性
 
@@ -47,10 +47,10 @@
 
 ### 🌐 技术栈
 - **后端**: Java 17, Spring Boot 3.2.0, Spring Security, Spring Data JPA
-- **数据库**: H2 (开发环境), MySQL (生产环境)
-- **前端**: HTML5, CSS3, JavaScript, Bootstrap 5
+- **前端**: Vue 3, Vite, TypeScript, Element Plus
+- **数据库**: PostgreSQL, Redis
 - **认证**: JWT (JSON Web Token)
-- **容器化**: Docker, Docker Compose
+- **容器化**: Docker
 
 ## 快速开始
 
@@ -60,98 +60,160 @@
 ```bash
 git clone https://github.com/mbtqtvpwd9-cmd/LibraryManagementSystem.git
 cd LibraryManagementSystem
+git checkout advanced-tech-stack
 ```
 
-2. **运行应用**
+2. **环境要求**
+- Java 17+
+- Node.js 18+
+- Maven 3.6+
+- Docker & Docker Compose
+
+3. **运行应用**
 ```bash
-# 使用Maven
-mvn spring-boot:run
+# 构建后端
+cd backend-microservices
+mvn clean package -DskipTests
+cd ..
 
-# 或者使用Java
-mvn clean package
-java -jar target/library-management-system-1.0.0.jar
-```
+# 构建前端
+cd frontend-vue
+npm install
+npm run build
+cd ..
 
-3. **访问应用**
-- 🌟 最终界面: http://localhost:8080
-- H2数据库控制台: http://localhost:8080/h2-console
-  - JDBC URL: `jdbc:h2:mem:librarydb`
-  - 用户名: `sa`
-  - 密码: `password`
-
-### Docker部署
-
-#### 方式1：标准部署
-```bash
+# 启动所有服务
 docker-compose up -d
 ```
 
-#### 方式2：离线部署（推荐，避免网络问题）
-```bash
-# 1. 下载所有需要的镜像
-./pull-images.sh
-
-# 2. 一键离线部署
-./offline-deploy.sh
-```
-
-#### 方式3：Ubuntu基础镜像部署（解决Maven镜像问题）
-```bash
-# 1. 下载基础镜像
-./pull-basic-images.sh
-
-# 2. 一键Ubuntu部署
-./deploy-ubuntu.sh
-```
-
-#### 访问应用
-- 应用地址: http://localhost:8080
-- MySQL数据库: localhost:3306
+4. **访问应用**
+- 🌟 前端应用: http://localhost:3000
+- 📊 API网关: http://localhost:8080
 
 ## 腾讯云部署指南
 
 ### 1. 准备工作
 - 腾讯云Ubuntu 22.04服务器
-- Docker 26已安装
-- Git已安装
+- 服务器IP: 150.158.125.55
+- 开放端口: 3000 (前端), 8080 (后端API)
 
-### 2. 从GitHub部署
+### 2. 快速部署（推荐）
 
 ```bash
 # 1. 登录服务器
-ssh root@your-server-ip
+ssh root@150.158.125.55
 
 # 2. 克隆项目
 git clone https://github.com/mbtqtvpwd9-cmd/LibraryManagementSystem.git
 cd LibraryManagementSystem
+git checkout advanced-tech-stack
 
-# 3. 一键最终部署（推荐）
-./final-deploy.sh
+# 3. 一键部署
+./java-fix-deploy.sh
 
-# 4. 查看运行状态
-docker-compose -f docker-compose.ubuntu.yml ps
-
-# 5. 查看日志
-docker-compose -f docker-compose.ubuntu.yml logs -f app
+# 4. 部署检查
+./check-deployment.sh
 ```
 
-### 3. 部署方式说明
+### 3. 部署脚本说明
 
-- **方式1**: `./final-deploy.sh` - 最终版本，修复所有问题
-- **方式2**: `./deploy-ubuntu.sh` - Ubuntu基础镜像版本
-- **方式3**: `./offline-deploy.sh` - 离线部署版本
+| 脚本名称 | 用途 |
+|---------|------|
+| `java-fix-deploy.sh` | 完整部署脚本（推荐首次使用）|
+| `manual-deploy.sh` | 手动更新部署脚本 |
+| `check-deployment.sh` | 检查部署状态 |
+| `troubleshoot-network.sh` | 网络问题排查 |
+| `fix-nginx-403-v2.sh` | 修复Nginx 403错误 |
+| `fix-vue-build.sh` | 修复Vue构建问题 |
 
-### 3. 配置防火墙
+### 4. 常见问题解决
+
+#### Java版本问题
 ```bash
-# 允许8080端口
-ufw allow 8080
-ufw reload
+./java-fix-deploy.sh  # 自动安装Java 17
 ```
 
-### 4. 生产环境配置
-- 修改 `application-prod.properties` 中的数据库连接信息
-- 确保MySQL数据持久化
-- 配置反向代理（Nginx）可选
+#### 前端构建问题
+```bash
+./fix-vue-build.sh  # 修复TypeScript编译错误
+```
+
+#### 网络访问问题
+```bash
+./troubleshoot-network.sh  # 排查网络问题
+```
+
+#### Nginx 403错误
+```bash
+./fix-nginx-403-v2.sh  # 修复权限和配置问题
+```
+
+### 5. 手动部署步骤
+
+如果自动脚本失败，可执行以下手动命令：
+
+```bash
+# 1. 停止旧容器
+docker stop $(docker ps -aq) 2>/dev/null || true
+docker rm $(docker ps -aq) 2>/dev/null || true
+
+# 2. 创建网络
+docker network create library-network 2>/dev/null || true
+
+# 3. 启动基础服务
+docker run -d --name postgres \
+  --network library-network \
+  -e POSTGRES_DB=library \
+  -e POSTGRES_USER=library \
+  -e POSTGRES_PASSWORD=library123 \
+  -p 5432:5432 \
+  postgres:15
+
+docker run -d --name redis \
+  --network library-network \
+  -p 6379:6379 \
+  redis:7-alpine
+
+# 4. 等待基础服务启动
+sleep 30
+
+# 5. 构建后端
+mvn clean package -DskipTests
+
+# 6. 构建前端
+cd frontend-vue
+npm install
+npm run build
+cd ..
+
+# 7. 启动应用服务
+docker run -d --name library-backend \
+  --network library-network \
+  -p 8080:8080 \
+  -v $(pwd)/target/library-management-system.jar:/app.jar \
+  openjdk:17-jdk-slim \
+  java -jar -Dserver.address=0.0.0.0 /app.jar
+
+docker run -d --name library-frontend \
+  --network library-network \
+  -p 3000:80 \
+  -v $(pwd)/frontend-vue/dist:/usr/share/nginx/html:ro \
+  nginx:alpine
+
+# 8. 检查状态
+sleep 30
+docker ps
+```
+
+## 微服务架构
+
+### 服务组件
+- **API网关** (8080): 统一入口，路由和负载均衡
+- **图书服务** (8081): 图书信息管理
+- **用户服务** (8082): 用户认证和管理
+- **借阅服务** (8083): 图书借阅管理
+- **前端应用** (3000): Vue 3单页应用
+- **数据库**: PostgreSQL + Redis
 
 ## API文档
 
@@ -171,13 +233,6 @@ ufw reload
 
 ## 数据库结构
 
-### 用户表 (users)
-- id: 主键
-- username: 用户名
-- password: 密码（加密）
-- role: 角色（ADMIN/READER）
-- email: 邮箱
-
 ### 图书表 (books)
 - id: 主键
 - isbn: ISBN号（唯一）
@@ -189,39 +244,20 @@ ufw reload
 - stockQuantity: 库存数量
 - description: 描述
 
-## 开发说明
-
-### 项目结构
-```
-src/main/java/com/example/library/
-├── LibraryManagementApplication.java  # 主启动类
-├── config/                            # 配置类
-│   ├── SecurityConfig.java           # 安全配置
-│   ├── JwtAuthenticationFilter.java # JWT过滤器
-│   └── DataInitializer.java         # 数据初始化
-├── controller/                       # 控制器
-│   ├── BookController.java          # 图书控制器
-│   └── AuthController.java          # 认证控制器
-├── model/                            # 实体类
-│   ├── Book.java                    # 图书实体
-│   └── User.java                    # 用户实体
-├── repository/                       # 数据访问层
-│   ├── BookRepository.java          # 图书仓库
-│   └── UserRepository.java          # 用户仓库
-├── service/                          # 业务逻辑层
-│   ├── BookService.java             # 图书服务
-│   └── UserService.java             # 用户服务
-└── util/                             # 工具类
-    └── JwtUtil.java                 # JWT工具类
-```
-
-### 环境配置
-- 开发环境: `application.properties` (H2数据库)
-- 生产环境: `application-prod.properties` (MySQL数据库)
+### 用户表 (users)
+- id: 主键
+- username: 用户名
+- password: 密码（加密）
+- role: 角色（ADMIN/READER）
+- email: 邮箱
 
 ## 默认账户
 - **管理员**: 用户名 `admin`, 密码 `admin123`
 - **读者**: 用户名 `reader`, 密码 `reader123`
+
+## 访问地址
+- 前端应用: http://150.158.125.55:3000
+- API网关: http://150.158.125.55:8080
 
 ## 许可证
 MIT License
