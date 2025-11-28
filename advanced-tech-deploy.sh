@@ -14,6 +14,57 @@ echo "   📊 PostgreSQL + Redis + MinIO 数据存储"
 echo "   🔄 CI/CD 自动化部署流程"
 echo ""
 
+# 检查并安装必要环境
+echo "🔧 检查和安装必要环境..."
+
+# 检查并安装Docker
+if ! command -v docker &> /dev/null; then
+    echo "🐳 安装Docker..."
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    sudo usermod -aG docker $USER
+    rm get-docker.sh
+else
+    echo "✅ Docker 已安装"
+fi
+
+# 检查并安装Docker Compose
+if ! command -v docker-compose &> /dev/null; then
+    echo "🔧 安装Docker Compose..."
+    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+else
+    echo "✅ Docker Compose 已安装"
+fi
+
+# 检查并安装Node.js和npm
+if ! command -v node &> /dev/null; then
+    echo "🟢 安装Node.js和npm..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+else
+    echo "✅ Node.js 已安装"
+fi
+
+# 检查并安装Java 17
+if ! command -v java &> /dev/null; then
+    echo "☕ 安装Java 17..."
+    sudo apt-get update
+    sudo apt-get install -y openjdk-17-jdk
+else
+    echo "✅ Java 已安装"
+fi
+
+# 检查并安装Maven
+if ! command -v mvn &> /dev/null; then
+    echo "🔨 安装Maven..."
+    sudo apt-get install -y maven
+else
+    echo "✅ Maven 已安装"
+fi
+
+echo ""
+
 # 1. 构建前端
 echo "步骤1: 构建现代化前端..."
 cd frontend-vue
