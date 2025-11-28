@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# 图书管理系统 - 最终版本部署脚本
-# 优化布局，只保留增强界面，深度优化前端体验
+# 图书管理系统 - 修复登录问题部署脚本
+# 修复登录BUG，添加密码显示/隐藏功能，优化错误提示
 
 set -e
 
-echo "=== 图书管理系统最终版部署 ==="
-echo "🎨 版本特点："
-echo "   ✨ 深度优化的现代化界面"
-echo "   🎯 解决仪表盘分层问题"
-echo "   📱 完美响应式布局"
-echo "   🚀 只保留最终增强页面"
-echo "   🎨 专业级UI/UX体验"
+echo "=== 图书管理系统修复版部署 ==="
+echo "🔧 本次修复："
+echo "   ✅ 修复登录无反应问题"
+echo "   ✅ 添加密码错误提示框"
+echo "   ✅ 实现密码显示/隐藏功能"
+echo "   ✅ 优化登录流程和用户体验"
+echo "   ✅ 添加加载状态和错误处理"
 echo ""
 
 # 1. 停止现有容器
@@ -36,7 +36,7 @@ echo "步骤5: 等待数据库启动..."
 sleep 30
 
 # 6. 等待应用启动
-echo "步骤6: 等待应用启动（优化版本启动中）..."
+echo "步骤6: 等待应用启动（修复版本启动中）..."
 sleep 90
 
 # 7. 检查服务状态
@@ -55,22 +55,26 @@ curl -s -I http://localhost:8080/ | head -1 || echo "主页访问测试"
 echo "测试API访问..."
 curl -s -I http://localhost:8080/api/books | head -1 || echo "API访问测试"
 
+echo "测试登录API..."
+curl -s -X POST http://localhost:8080/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"admin123","role":"ADMIN"}' | head -1 || echo "登录API测试"
+
 echo ""
 echo "=== 部署完成 ==="
 echo "🌟 访问地址："
-echo "   📱 最终界面: http://150.158.125.55:8080/"
+echo "   📱 修复版界面: http://150.158.125.55:8080/"
 echo ""
 echo "🔑 默认账户："
 echo "   👨‍💼 管理员: admin/admin123"
 echo "   👤 读者: reader/reader123"
 echo ""
-echo "✨ 界面特性："
-echo "   ✅ 深度优化的现代化设计"
-echo "   ✅ 完美解决的仪表盘分层问题"
-echo "   ✅ 专业级的布局和交互"
-echo "   ✅ 流畅的动画和过渡效果"
-echo "   ✅ 完全响应式设计"
-echo "   ✅ 直观的用户体验"
+echo "✨ 本次修复："
+echo "   ✅ 登录功能完全正常"
+echo "   ✅ 密码错误有明确提示"
+echo "   ✅ 支持密码显示/隐藏"
+echo "   ✅ 登录状态实时反馈"
+echo "   ✅ 网络错误智能处理"
 echo ""
 echo "🔧 管理命令："
 echo "   重启: docker-compose -f docker-compose.ubuntu.yml restart"

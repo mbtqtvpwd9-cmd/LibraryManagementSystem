@@ -35,6 +35,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
+        String selectedRole = loginRequest.get("role"); // 获取用户选择的角色
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -44,15 +45,27 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
             
+            // 验证用户角色是否匹配选择的角色
+            if (selectedRole != null && !selectedRole.isEmpty() && 
+                !selectedRole.equals(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("用户角色不匹配，请选择正确的角色");
+            }
+            
             String token = jwtUtil.generateToken(user);
             
+            // 创建用户对象
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", user.getId());
+            userMap.put("username", user.getUsername());
+            userMap.put("role", user.getRole());
+            userMap.put("email", user.getEmail());
+            
+            // 创建响应对象
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             response.put("type", "Bearer");
-            response.put("id", user.getId());
-            response.put("username", user.getUsername());
-            response.put("role", user.getRole());
-            response.put("email", user.getEmail());
+            response.put("user", userMap);
             
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
